@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Triple Threat — Home</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#071426;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#fff;min-height:100vh}
+
+.header{background:#0d1f35;padding:20px 16px;border-bottom:1px solid #1e3a5f;text-align:center}
+.brand-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
+.logo-img{width:64px;height:auto}
+.sync-chip{position:absolute;top:16px;right:16px;font-size:10px;color:#8fa3bc;background:rgba(255,255,255,.06);border-radius:20px;padding:5px 10px;white-space:nowrap}
+.header{position:relative}
+.tagline{font-size:12.5px;color:#8fa3bc;line-height:1.5;max-width:320px;margin:0 auto}
+
+.section{margin:10px;background:#0d1f35;border-radius:14px;border:1px solid #214369;padding:14px}
+.section-title{font-size:11px;font-weight:800;color:#5b87c4;text-transform:uppercase;letter-spacing:1.7px;margin-bottom:12px}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat-card{background:#081a2e;border:1px solid #214369;border-radius:12px;padding:12px}
+.stat-card.coming{border-style:dashed;opacity:.6}
+.stat-label{font-size:9px;color:#5b87c4;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.stat-val{font-size:21px;font-weight:850}
+.stat-sub{font-size:11px;color:#10b981;font-weight:700;margin-top:5px}
+.stat-card.coming .stat-val{font-size:13px;color:#5b6f89}
+.stat-card.coming .stat-sub{color:#5b6f89}
+
+.entry{background:#081a2e;border:1px solid #214369;border-radius:14px;padding:13px 14px;margin-bottom:10px;text-decoration:none;display:block;color:#fff}
+.entry-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.chip{font-size:10px;font-weight:750;padding:4px 10px;border-radius:20px;background:#153866;color:#74b2ff}
+.entry-time{font-size:10.5px;font-weight:800;color:#5b87c4;text-transform:uppercase;letter-spacing:1px}
+.p-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:750;margin-bottom:6px}
+.p-row .pct{font-size:12.5px;font-weight:800}
+.p-row.fav{color:#60a5fa}
+.p-row.dog{color:#fb7185}
+.bar-track{height:5px;border-radius:4px;background:#1e3a5f;display:flex;overflow:hidden;margin-bottom:8px}
+.bar-fav{height:100%;background:#2563eb;border-radius:4px 0 0 4px}
+.bar-dog{height:100%;background:#ef4444;border-radius:0 4px 4px 0;margin-left:auto}
+
+.empty{text-align:center;padding:34px 16px;color:#6f87a3;font-size:12.5px;background:#081a2e;border:1px dashed #214369;border-radius:14px}
+.empty strong{display:block;color:#fff;font-size:13.5px;font-weight:800;margin-bottom:4px}
+.footer-note{text-align:center;font-size:9.5px;color:#5b6f89;letter-spacing:.8px;text-transform:uppercase;padding:18px 16px 26px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="sync-chip" id="syncChip">Loading…</div>
+  <div class="brand-row">
+    <img class="logo-img" src="logo.png" alt="Triple Threat">
+  </div>
+  <div class="tagline">Advanced models. Real edges.<br>Helping you see what others miss.</div>
+</div>
+
+<div class="section">
+  <div class="section-title">Performance — Free Tier</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Last 7 Record</div>
+      <div class="stat-val" id="v-last7record"></div>
+      <div class="stat-sub" id="v-last7winpct"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Best Market</div>
+      <div class="stat-val" id="v-bestmarket"></div>
+      <div class="stat-sub">last 7 days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Overall Record</div>
+      <div class="stat-val" id="v-overallrecord"></div>
+      <div class="stat-sub">all-time accuracy</div>
+    </div>
+    <div class="stat-card coming">
+      <div class="stat-label">Model Confidence</div>
+      <div class="stat-val">Coming Soon</div>
+      <div class="stat-sub">not aggregated yet</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Free Market Breakdown</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">DF Accuracy</div>
+      <div class="stat-val" id="v-dfacc"></div>
+      <div class="stat-sub" id="v-dfrec"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">BP Accuracy</div>
+      <div class="stat-val" id="v-bpacc"></div>
+      <div class="stat-sub" id="v-bprec"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Aces Accuracy</div>
+      <div class="stat-val" id="v-acesacc"></div>
+      <div class="stat-sub" id="v-acesrec"></div>
+    </div>
+    <div class="stat-card coming">
+      <div class="stat-label">Last 7 Units</div>
+      <div class="stat-val">Coming Soon</div>
+      <div class="stat-sub">not tracked yet</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Today's Slate — <span id="slateCount">0</span> Matches</div>
+  <div id="slateList"></div>
+</div>
+
+<div class="footer-note">Triple Threat Prototype Model</div>
+
+<script>
+/* =====================================================================
+   PART 1 — AGGREGATE STATS
+   These come in as URL query params, set by Glide's "Construct URL"
+   column bound to your dashboard-row columns (same pattern as your
+   Match Detail page). Example param names below — rename to match
+   whatever you call the columns in Glide's Construct URL builder.
+   ===================================================================== */
+function qp(k){ return new URLSearchParams(window.location.search).get(k) || ''; }
+function setText(id, val, fallback){
+  const e = document.getElementById(id);
+  if (e) e.textContent = val || fallback || '—';
+}
+
+setText('v-last7record', qp('last7record'));
+setText('v-last7winpct', qp('last7winpct'));
+setText('v-bestmarket', qp('bestmarket'));
+setText('v-overallrecord', qp('overallrecord'));
+setText('v-dfacc', qp('dfacc'));
+setText('v-dfrec', qp('dfrec'));
+setText('v-bpacc', qp('bpacc'));
+setText('v-bprec', qp('bprec'));
+setText('v-acesacc', qp('acesacc'));
+setText('v-acesrec', qp('acesrec'));
+
+/* =====================================================================
+   PART 2 — TODAY'S SLATE (list, unknown row count)
+   Same approach as your Update Log page: publish "Glide Slate Feed"
+   to web as CSV (File > Share > Publish to web > select sheet > CSV),
+   paste that link below. Each row becomes a clickable card that links
+   to your existing Match Detail page using the SAME query-param
+   pattern your match-detail.html already uses (fav, dog, tournament,
+   round, surface, date, time).
+   Expected CSV columns (in this order — matches "Glide Slate Feed"):
+   Tournament, Surface, Round, Time, Favored Player, Favored Win %,
+   Underdog Player, Underdog Win %
+   ===================================================================== */
+const CONFIG = {
+  SLATE_CSV_URL: "PASTE_YOUR_PUBLISHED_GLIDE_SLATE_FEED_CSV_LINK_HERE",
+  MATCH_DETAIL_BASE: "https://dblxlgaming-sudo.github.io/tennis-match-detail"
+};
+
+const SAMPLE_CSV = `Tournament,Surface,Round,Time,Favored Player,Favored Win %,Underdog Player,Underdog Win %
+WTA Athens,Hard,F,7:30AM,Barbora Krejcikova,53.5%,Maria Sakkari,46.5%
+WTA Iasi,Clay,F,10:00AM,Mayar Sherif,62.9%,Paula Badosa,37.1%`;
+
+function pctVal(s){
+  const n = parseFloat(String(s).replace('%',''));
+  return isNaN(n) ? 0 : n;
+}
+
+function buildDetailUrl(row){
+  const params = new URLSearchParams({
+    fav: row.favPlayer,
+    dog: row.dogPlayer,
+    tournament: row.tournament,
+    round: row.round,
+    surface: row.surface,
+    time: row.time
+  });
+  return CONFIG.MATCH_DETAIL_BASE + "?" + params.toString();
+}
+
+function renderSlate(csvText){
+  const rows = Papa.parse(csvText.trim(), { skipEmptyLines: true }).data;
+  const matches = [];
+  for (let i = 1; i < rows.length; i++){
+    const r = rows[i];
+    if (!r || !r[0]) continue;
+    matches.push({
+      tournament: (r[0]||'').trim(),
+      surface: (r[1]||'').trim(),
+      round: (r[2]||'').trim(),
+      time: (r[3]||'').trim(),
+      favPlayer: (r[4]||'').trim(),
+      favPct: (r[5]||'').trim(),
+      dogPlayer: (r[6]||'').trim(),
+      dogPct: (r[7]||'').trim()
+    });
+  }
+
+  document.getElementById('slateCount').textContent = matches.length;
+  const list = document.getElementById('slateList');
+
+  if (!matches.length){
+    list.innerHTML = `<div class="empty"><strong>No matches yet</strong>Check back once today's slate is published.</div>`;
+    return;
+  }
+
+  list.innerHTML = matches.map(m => {
+    const fPct = pctVal(m.favPct), dPct = pctVal(m.dogPct);
+    const total = fPct + dPct || 1;
+    return `
+    <a class="entry" href="${buildDetailUrl(m)}">
+      <div class="entry-top">
+        <span class="chip">${m.tournament}${m.surface ? ' · ' + m.surface : ''}</span>
+        <span class="entry-time">${m.time}</span>
+      </div>
+      <div class="p-row fav"><span>${m.favPlayer}</span><span class="pct">${m.favPct}</span></div>
+      <div class="bar-track">
+        <div class="bar-fav" style="width:${(fPct/total*100).toFixed(1)}%"></div>
+        <div class="bar-dog" style="width:${(dPct/total*100).toFixed(1)}%"></div>
+      </div>
+      <div class="p-row dog"><span>${m.dogPlayer}</span><span class="pct">${m.dogPct}</span></div>
+    </a>`;
+  }).join('');
+}
+
+function loadSlate(){
+  if (!CONFIG.SLATE_CSV_URL || CONFIG.SLATE_CSV_URL.indexOf('PASTE_YOUR') === 0){
+    renderSlate(SAMPLE_CSV);
+    document.getElementById('syncChip').textContent = 'Preview mode';
+    return;
+  }
+  fetch(CONFIG.SLATE_CSV_URL, { cache: 'no-store' })
+    .then(res => { if (!res.ok) throw new Error('Sheet fetch failed: ' + res.status); return res.text(); })
+    .then(text => {
+      renderSlate(text);
+      document.getElementById('syncChip').textContent =
+        'Synced ' + new Date().toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+    })
+    .catch(err => {
+      document.getElementById('syncChip').textContent = 'Sync failed';
+      renderSlate(SAMPLE_CSV);
+      console.error(err);
+    });
+}
+
+loadSlate();
+</script>
+</body>
+</html>
