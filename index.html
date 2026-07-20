@@ -347,12 +347,18 @@ function numberFromPct(v){
 }
 
 function renderSlate(csvText){
-  const parsed=Papa.parse(csvText.trim(),{header:true,skipEmptyLines:true});
-  const allRows=parsed.data.filter(r=>r["Tournament"]);
-const visibleCount=Math.max(1,Math.ceil(allRows.length/4));
-const rows=allRows.slice(0,visibleCount);
-  setText("slateCount",String(allRows.length),"0");
-  const list=document.getElementById("slateList");
+  const parsed = Papa.parse(csvText.trim(), {
+  header: true,
+  skipEmptyLines: true
+});
+
+const allRows = parsed.data.filter(r => r["Tournament"]);
+const visibleCount = Math.max(1, Math.ceil(allRows.length / 4));
+const rows = allRows.slice(0, visibleCount);
+
+setText("slateCount", String(allRows.length), "0");
+
+const list = document.getElementById("slateList");
 
   if(!rows.length){
     list.innerHTML='<div class="empty"><strong>No matches yet</strong>Check back when today’s slate is published.</div>';
