@@ -179,8 +179,8 @@ body{
   font-size:14px;
   font-weight:850;
 }
-.pct.favpct{color:var(--green)}
-.pct.dogpct{color:#b7c2d6}
+.pct.highpct{color:var(--green)}
+.pct.lowpct{color:#b7c2d6}
 .bar-track{
   height:5px;
   border-radius:8px;
@@ -364,6 +364,8 @@ function renderSlate(csvText){
     const favPct=(r["Favored Win Probability"]||r["Favored Win %"]||"").trim();
     const dogPct=(r["Underdog Win Probability"]||r["Underdog Win %"]||"").trim();
     const f=numberFromPct(favPct),d=numberFromPct(dogPct),total=f+d||1;
+    const favPctClass=f>=d?"highpct":"lowpct";
+    const dogPctClass=d>f?"highpct":"lowpct";
 
     return `
       <div class="entry">
@@ -371,12 +373,12 @@ function renderSlate(csvText){
           <span class="chip">${tournament}${surface?" · "+surface:""}</span>
           <span class="entry-time">${time}</span>
         </div>
-        <div class="p-row"><span>${fav}</span><span class="pct favpct">${favPct}</span></div>
+        <div class="p-row"><span>${fav}</span><span class="pct ${favPctClass}">${favPct}</span></div>
         <div class="bar-track">
           <div class="bar-fav" style="width:${(f/total*100).toFixed(1)}%"></div>
           <div class="bar-dog" style="width:${(d/total*100).toFixed(1)}%"></div>
         </div>
-        <div class="p-row"><span>${dog}</span><span class="pct dogpct">${dogPct}</span></div>
+        <div class="p-row"><span>${dog}</span><span class="pct ${dogPctClass}">${dogPct}</span></div>
       </div>`;
   }).join("");
 }
