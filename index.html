@@ -414,10 +414,10 @@ function renderSlate(csvText){
     const tournament=(r["Tournament"]||"").trim();
     const surface=(r["Surface"]||"").trim();
     const time=(r["Time"]||"").trim();
-    const fav=(r["Favored Player"]||"").trim();
-    const dog=(r["Underdog Player"]||"").trim();
-    const favPct=(r["Favored Win Probability"]||r["Favored Win %"]||"").trim();
-    const dogPct=(r["Underdog Win Probability"]||r["Underdog Win %"]||"").trim();
+   const fav=(r["Model Favored Player"]||"").trim();
+const dog=(r["Other Player"]||"").trim();
+const favPct=(r["Model Favored Win Probability"]||"").trim();
+const dogPct=(r["Other Player Win Probability"]||"").trim();
     const f=numberFromPct(favPct),d=numberFromPct(dogPct),total=f+d||1;
     const favPctClass=f>=d?"highpct":"lowpct";
     const dogPctClass=d>f?"highpct":"lowpct";
