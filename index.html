@@ -346,29 +346,71 @@ function numberFromPct(v){
   return Number.isFinite(n)?n:0;
 }
 
+// Parses a Date cell from the CSV into a plain "local calendar day" key,
+// e.g. "2026-07-25". Handles both real date strings (7/25/2026, 2026-07-25)
+// and Excel serial numbers, in case the export ever comes through as one.
+function toDayKey(raw){
+  if(!raw) return null;
+  const s=String(raw).trim();
+  if(!s) return null;
+
+  // Excel serial date (e.g. "46224") — convert using the 1899-12-30 epoch
+  if(/^\d+(\.\d+)?$/.test(s)){
+    const serial=parseFloat(s);
+    const epoch=new Date(Date.UTC(1899,11,30));
+    const d=new Date(epoch.getTime()+serial*86400000);
+    return d.toISOString().slice(0,10);
+  }
+
+  const d=new Date(s);
+  if(isNaN(d.getTime())) return null;
+  // use local-timezone Y-M-D, not UTC, so it matches the viewer's own "today"
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function todayKey(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
 function renderSlate(csvText){
   const parsed = Papa.parse(csvText.trim(), {
-  header: true,
-  skipEmptyLines: true
-});
+    header: true,
+    skipEmptyLines: true
+  });
 
-const allRows = parsed.data.filter(r => r["Tournament"]);
-const visibleCount = Math.min(
-  4,
-  Math.max(1, Math.ceil(allRows.length / 4))
-);
-const rows = allRows.slice(0, visibleCount);
+  const allRows = parsed.data.filter(r => r["Tournament"]);
 
-setText("slateCount", String(allRows.length), "0");
+  // Filter to the viewer's own "today" using the Date column from the CSV.
+  // This is what makes the page flip over at midnight on its own, instead
+  // of waiting on the next manual export.
+  const today = todayKey();
+  const dateField = "Date"; // matches the column name exported from glide slate feed
+  const hasDateColumn = allRows.length > 0 && (dateField in allRows[0]);
 
-const list = document.getElementById("slateList");
+  const rows = hasDateColumn
+    ? allRows.filter(r => toDayKey(r[dateField]) === today)
+    : allRows; // fallback: no Date column present yet, show everything (old behavior)
+
+  setText("slateCount", String(rows.length), "0");
+
+  const list = document.getElementById("slateList");
 
   if(!rows.length){
     list.innerHTML='<div class="empty"><strong>No matches yet</strong>Check back when today’s slate is published.</div>';
     return;
   }
 
-  list.innerHTML=rows.map(r=>{
+  // Show up to 4 of today's matches on the home screen preview
+  const visible = rows.slice(0, 4);
+
+  list.innerHTML=visible.map(r=>{
     const tournament=(r["Tournament"]||"").trim();
     const surface=(r["Surface"]||"").trim();
     const time=(r["Time"]||"").trim();
